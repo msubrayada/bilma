@@ -4,7 +4,8 @@ from tensorflow.keras.layers import  Input,  Dense, Embedding
 from tensorflow.keras.models import Model, load_model
 import tensorflow as tf
 
-import bilma.wordpiece_tokenizer
+from bilma.preprocessing import preprocess
+from bilma import wordpiece_tokenizer
 
 def loss_function(ignore_id=0):
     loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction='none')
@@ -61,15 +62,23 @@ class tokenizer():
         self.MASK = 4  
         
     def tokenize(self, text):
-        c = self.tokenizer.tokenize([text])                       
-        c = tf.concat([[[self.START]], c, [[self.END]]], axis=1)
-        l_c = len(c[0])
-        c = tf.pad(c, [[0,0],[0,self.max_length-l_c]])
-        return c.numpy()
+        text = [preprocess(t) for t in text]
+        tokens = tf.ragged.constant(self.tokenizer.tokenize(text),  tf.int32)        
+        count, _ = tokens.bounding_shape()
+        starts = tf.fill([count,1], self.START)
+        ends = tf.fill([count,1], self.END)
+        tokens = tf.concat([starts, tokens[:, 0: self.max_length - 2], ends], axis=1)
+        tokens = tokens.to_tensor(self.PAD, shape=(len(text), self.max_length))
+        return tokens.numpy()
     
-    def detokenize(self, tokens):
-        words = self.tokenizer.detokenize(tokens)
-        return tf.strings.reduce_join(words, separator=' ', axis=-1)
+    def detokenize(self, tokens, human_readable=True):
+        words = self.tokenizer.detokenize(tokens, human_readable=human_readable)
+        if (human_readable==True):
+            return [" ".join(w) for w in words]
+        text = tf.strings.reduce_join(words, separator=' ', axis=-1)
+        return text
+    
+
         
     
     
