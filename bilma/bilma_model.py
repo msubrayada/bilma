@@ -71,13 +71,19 @@ class tokenizer():
         tokens = tokens.to_tensor(self.PAD, shape=(len(text), self.max_length))
         return tokens.numpy()
     
-    def detokenize(self, tokens, human_readable=True):
+    def detokenize(self, tokens, human_readable=True):                
         words = self.tokenizer.detokenize(tokens, human_readable=human_readable)
         if (human_readable==True):
             return [" ".join(w) for w in words]
         text = tf.strings.reduce_join(words, separator=' ', axis=-1)
         return text
     
+    def top_k(self, predictions, positions, k=10):
+        top = []
+        for p, m in zip(predictions, positions):
+            top_k = self.detokenize([tf.argsort(p[m])[-k:][::-1]], False).numpy()[0].decode('utf8').split()
+            top.append(top_k)
+        return top
 
         
     
