@@ -55,6 +55,7 @@ def load(model_file):
 class tokenizer():
     def __init__(self, vocab_file, max_length):
         self.tokenizer = wordpiece_tokenizer.Tokenizer(vocab_file)
+        self.emo_labels = "❤👌👏💔😄😊😌😍😒😘😡😢😭🤔🥺"
         self.max_length = max_length
         self.START = 2
         self.END = 3
@@ -85,6 +86,9 @@ class tokenizer():
             top.append(top_k)
         return top
 
+    def decode_emo(self, predictions):
+        emo = tf.argmax(predictions, axis=-1)
+        return [self.emo_labels[i] for i in emo]
         
     
     
