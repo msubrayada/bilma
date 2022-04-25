@@ -51,4 +51,5 @@ p = model.predict(toks)
 tokenizer.decode_emo(p[1])
 ```
 
-which produces the output:
+which produces the output: ![emoji-output](https://user-images.githubusercontent.com/392873/165176270-77dd32ca-377e-4d29-ab4a-bc5f75913241.jpg)
+each emoji correspond to each entry in `texts`.
