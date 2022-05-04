@@ -27,7 +27,7 @@ def norm_chars(text):
             u = BLANK
         
         if u in SYMBOLS:
-            if L[-1] != BLANK:
+            if len(L) > 0 and L[-1] != BLANK:
                 L.append(BLANK)
             
             L.append(u)
