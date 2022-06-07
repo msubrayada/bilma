@@ -1,4 +1,5 @@
 from bilma import bilma_model
+import importlib_resources
 
 class bilma_demo():
     def __init__(self, model_file):
@@ -17,8 +18,11 @@ class bilma_demo():
     
 
     def load_model(self, model_file):
+        
         model = bilma_model.load(model_file)
-        tokenizer = bilma_model.tokenizer(vocab_file="bilma/resources/vocab_file_ALL.txt", max_length=280)
+        my_resources = importlib_resources.files("bilma") / "resources"
+        vocab_file = str((my_resources / "vocab_file_ALL.txt").joinpath())
+        tokenizer = bilma_model.tokenizer(vocab_file, max_length=280)
         return model, tokenizer
     
     def emoticons(self):
